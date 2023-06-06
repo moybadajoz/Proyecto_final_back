@@ -6,6 +6,7 @@ const user = require('../models/user')
 const { response } = require('express')
 
 router.post('/', async(req, res) => {
+    console.log(req.body)
     const {email, password} = req.body
 
     if(!email || !password){
@@ -26,7 +27,7 @@ router.post('/', async(req, res) => {
         if(err)
             console.log(err)
         if(response) {
-            const token = Jwt.sign({id: emailExists._id}, process.env.TOKEN_SECRET)
+            const token = Jwt.sign({id: emailExists._id}, process.env.TOKEN_SECRET, {expiresIn: "1h"})
             
             return res.json({
                 error: null,

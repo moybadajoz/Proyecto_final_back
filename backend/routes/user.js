@@ -117,18 +117,20 @@ router.get('/', async(req, res) => {
 })
     
 router.get('/:id', async(req, res) => {
-    /*const {token} = req.headers
-    let token_decode = ''
+    const {token} = req.headers
+    const {id} = req.params
+    let tokenDecode = ''
     try {
-        token_decode = Jwt.verify(token, process.env.TOKEN_SECRET)
-        if(token_decode.type != 'company')
-            return res.json({error: "You cannot see this"})
+        tokenDecode = Jwt.verify(token, process.env.TOKEN_SECRET)
     } catch(err) {
         return res.json({error:"Session Expired", data: err})
-    }*/
+    }
 
-    //const User = await user.findOne({_id: req.params.id, id_company: token_decode.id})
-    const User = await user.findOne({_id: req.params.id})
+    if(id !== tokenDecode.id){
+        return res.status(400).json({ error: "You can't get this"})
+    }
+
+    const User = await user.findOne({_id:id})
 
     if (User) {
     res.json({
@@ -143,14 +145,20 @@ router.get('/:id', async(req, res) => {
     }
 })
 
-router.put('/', async(req, res) => {
-    //add token
-
+router.put('/:id', async(req, res) => {
     const { name, email, password, passConfirm } = req.body
     const {token} = req.headers
-
-    //extrae el id
-    const { id } = req.params
+    const {id} = req.params
+    let tokenDecode = ''
+    try {
+        tokenDecode = Jwt.verify(token, process.env.TOKEN_SECRET)
+    } catch(err) {
+        return res.json({error:"Session Expired", data: err})
+    }
+    
+    if(id !== tokenDecode.id){
+        return res.status(400).json({ error: "You can't edit this" })
+    }
     //verifica si el usuario exite
     const User = await user.findById(id)
     if (!User ){
@@ -242,6 +250,32 @@ router.put('/', async(req, res) => {
         }
     } catch (error) {
         return res.json({
+            error: error
+        })
+    }
+})
+
+router.delete('/:id', async(req, res) => {
+    const {token} = req.headers
+    const {id} = req.params
+    let tokenDecode = ''
+    try {
+        tokenDecode = Jwt.verify(token, process.env.TOKEN_SECRET)
+    } catch(err) {
+        return res.json({error:"Session Expired", data: err})
+    }
+    
+    if(id !== tokenDecode.id){
+        return res.status(400).json({ error: "You can't delete that" })
+    }
+    try{
+        const User = await user.findByIdAndDelete(id)
+        return res.json({
+            error: null,
+            msg: "Success"
+        })
+    } catch (error){
+        return res.status(400).json({
             error: error
         })
     }

@@ -19,14 +19,14 @@ mongoose.connect(process.env.MONGO_URL, {
   .catch((error) => console.log('Error: ' + error))
 
 // Creacion e importacion de rutas
-//const NoteRoutes = require('./routes/note')
+const NoteRoutes = require('./routes/note')
 const Login = require('./routes/login')
 const UserRoutes = require('./routes/user')
 
 // Ruta del middleware
 app.use('/user', UserRoutes)
 app.use('/login', Login)
-//app.use('/note', NoteRoutes)
+app.use('/note', NoteRoutes)
 
 const PORT = process.env.PORT || 4000
 

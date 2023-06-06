@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const company = require('./user')
 
 const noteSchema = mongoose.Schema({
-    id_use: {
+    id_user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user',
         required: true
