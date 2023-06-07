@@ -3,8 +3,10 @@ const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 require('dotenv').config()
 
-const app = express()
+const cors = require('cors')
 
+const app = express()
+app.use(cors())
 //Capture the body
 app.use(bodyParser.urlencoded({
     extended: false

@@ -23,7 +23,7 @@ router.post('/', async(req, res) => {
 
     //verificar que se haya enviado lo necesario
     if( !name || !email || !password || !passConfirm ){
-        return res.status(400).json({
+        return res.json({
             error: "Some data is missing",
             data: null
         })
@@ -31,14 +31,14 @@ router.post('/', async(req, res) => {
     //verifica si la contraseña es valida con respecto a un ReGex
     const { error: passError } = PasswordValidation.validate({password})
     if (passError){
-        return res.status(400).json({
+        return res.json({
             error: "Invalid password",
             data: null
         })
     }
     //verifica si las contraseñas son iguales
     if (password !== passConfirm){
-        return res.status(400).json({
+        return res.json({
             error: "Passwords do not match",
             data: null
         })
@@ -46,7 +46,7 @@ router.post('/', async(req, res) => {
     //verifica si el nombre es valido (no sea demasiado largo)
     const { error: nameError } = NameValidation.validate({name})
     if ( nameError){
-        return res.status(400).json({
+        return res.json({
             error: "The name is not valid",
             data: null
         })
@@ -54,7 +54,7 @@ router.post('/', async(req, res) => {
     //verifica si el email es valido (que tenga la estructura tipica de un email)
     const { error: emailError } = EmailValidation.validate({email})
     if ( emailError ){
-        return res.status(400).json({
+        return res.json({
             error: "The email is not valid",
             data: null
         })
@@ -62,7 +62,7 @@ router.post('/', async(req, res) => {
     //Busca si el email existe en la base de datos (~Falta verificar que no existe en la coleccion de empleados)
     const emailExists = await user.findOne({ email: email })
     if (emailExists){
-        return res.status(400).json({
+        return res.json({
             error: "Email already exists",
             data: null
         })

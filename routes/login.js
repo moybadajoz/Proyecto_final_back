@@ -3,14 +3,16 @@ const bcrypt = require('bcrypt')
 const Jwt = require('jsonwebtoken')
 const { default: mongoose } = require('mongoose')
 const user = require('../models/user')
-const { response } = require('express')
+const express = require('express')
+
+
+
 
 router.post('/', async(req, res) => {
-    console.log(req.body)
     const {email, password} = req.body
 
     if(!email || !password){
-        return res.status(400).json({
+        return res.json({
             error: "Some data is missing",
             data: null
         })
@@ -18,7 +20,7 @@ router.post('/', async(req, res) => {
     const emailExists = await user.findOne({email: email})
 
     if(!emailExists){
-        return res.status(401).json({
+        return res.json({
             error: "Email not find",
             data: null
         })
@@ -31,11 +33,11 @@ router.post('/', async(req, res) => {
             
             return res.json({
                 error: null,
-                msg: "Sucess",
+                msg: "Success",
                 token: token
             })
         } else {
-            return res.status(401).json({ msg: "Invalid credencial" })
+            return res.json({ msg: "Invalid credencial" })
         }
     })
 })
