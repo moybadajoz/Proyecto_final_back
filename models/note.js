@@ -8,11 +8,14 @@ const noteSchema = mongoose.Schema({
         required: true
     }, 
     title: {
-        type: String, 
-        max: 255,
+        type: String
     },
     content: {
         type: String
+    },
+    color: {
+        type: String,
+        default: '#FFFFFF'
     },
     date: {
         type: Date,

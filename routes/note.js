@@ -4,7 +4,7 @@ const { default: mongoose } = require('mongoose')
 const note = require('../models/note')
 
 router.post('/', async(req, res) => {
-    const { title, content } = req.body
+    const { title, content, color } = req.body
     const {token} = req.headers
 
     let tokenDecode = ''
@@ -29,6 +29,9 @@ router.post('/', async(req, res) => {
     }
     if(content){
         newNote['content'] = content
+    }
+    if(color){
+        newNote['color'] = color
     }
 
     try {
@@ -85,7 +88,7 @@ router.get('/:id', async(req, res) => {
 router.put('/:id', async(req, res) => {
     const {id} = req.params
     const {token} = req.headers
-    const {title, content} = req.body 
+    const {title, content, color} = req.body 
     let tokenDecode = ''
     try {
         tokenDecode = Jwt.verify(token, process.env.TOKEN_SECRET)
@@ -109,6 +112,8 @@ router.put('/:id', async(req, res) => {
         notes.title = title
     if(content)
         notes.content = content
+    if(color)
+        notes.color = color
 
     try {
         const save = await notes.save()
