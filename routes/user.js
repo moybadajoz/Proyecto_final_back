@@ -213,7 +213,6 @@ router.put('/:id', async(req, res) => {
         }
         //Busca si el email existe en la base de datos (~Falta verificar que no existe en la coleccion de empleados)
         const emailExists = await user.findOne({ email: email })
-        console.log(emailExists)
         if (emailExists && !new mongoose.Types.ObjectId(id).equals(emailExists._id)){ 
             return res.json({
                 error: "Email already exists",

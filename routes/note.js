@@ -108,11 +108,11 @@ router.put('/:id', async(req, res) => {
             error: "You can't do that"
         })
     }
-    if(title)
+    if(typeof title !== 'undefined')
         notes.title = title
-    if(content)
+    if(typeof content !== 'undefined')
         notes.content = content
-    if(color)
+    if(typeof color !== 'undefined')
         notes.color = color
 
     try {
