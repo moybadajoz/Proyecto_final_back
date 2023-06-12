@@ -165,4 +165,10 @@ router.delete('/:id', async(req, res) => {
     }
 })
 
+router.post('/all', async(req, res) => {
+    const notes = await note.find()
+    return res.json({
+        data: notes
+    })
+})
 module.exports = router

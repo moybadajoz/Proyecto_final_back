@@ -9,7 +9,6 @@ const express = require('express')
 
 
 router.post('/', async(req, res) => {
-    console.log(req.headers)
     const {email, password} = req.body
 
     if(!email || !password){

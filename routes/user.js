@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const Jwt = require('jsonwebtoken')
 const { default: mongoose } = require('mongoose')
 const user = require('../models/user')
+const note = require('../models/note')
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\d\s:])([^\s]){8,32}$/
 const emailRegex = /^\S+@\S+\.\S+$/
@@ -97,7 +98,7 @@ router.post('/', async(req, res) => {
     }
 })
 
-router.get('/', async(req, res) => {
+router.get('/all', async(req, res) => {
     /*const {token} = req.headers
     let token_decode = ''
     try {
@@ -116,9 +117,8 @@ router.get('/', async(req, res) => {
     })
 })
     
-router.get('/:id', async(req, res) => {
+router.get('/', async(req, res) => {
     const {token} = req.headers
-    const {id} = req.params
     let tokenDecode = ''
     try {
         tokenDecode = Jwt.verify(token, process.env.TOKEN_SECRET)
@@ -126,11 +126,7 @@ router.get('/:id', async(req, res) => {
         return res.json({error:"Session Expired", data: err})
     }
 
-    if(id !== tokenDecode.id){
-        return res.status(400).json({ error: "You can't get this"})
-    }
-
-    const User = await user.findOne({_id:id})
+    const User = await user.findOne({_id:tokenDecode.id})
 
     if (User) {
     res.json({
@@ -157,12 +153,12 @@ router.put('/:id', async(req, res) => {
     }
     
     if(id !== tokenDecode.id){
-        return res.status(400).json({ error: "You can't edit this" })
+        return res.json({ error: "You can't edit this" })
     }
     //verifica si el usuario exite
     const User = await user.findById(id)
     if (!User ){
-        return res.status(400).json({
+        return res.json({
             error: "User not found",
             data: null
         })
@@ -170,7 +166,7 @@ router.put('/:id', async(req, res) => {
 
     //verifica que no se envie una de las 2 contraseñas sin la otra
     if ((typeof password !== 'undefined') !== (typeof passConfirm !== 'undefined')) {
-        return res.status(400).json({
+        return res.json({
             error: "Missing data",
             data: null
         })
@@ -179,14 +175,14 @@ router.put('/:id', async(req, res) => {
     if (password && passConfirm) {
         const { error: passError } = PasswordValidation.validate({password})
         if( passError ) {
-            return res.status(400).json({
+            return res.json({
                 error: "Invalid password",
                 data: null
             })
         }
         //verifica que las contraseñas sean iguales
         if (password !== passConfirm){
-            return res.status(400).json({
+            return res.json({
                 error: "Passwords do not match",
                 data: null
             })
@@ -199,7 +195,7 @@ router.put('/:id', async(req, res) => {
     if(name){
         const { error: nameError } = NameValidation.validate({name})
         if ( nameError){
-            return res.status(400).json({
+            return res.json({
                 error: "The name is not valid",
                 data: null
             })
@@ -210,22 +206,23 @@ router.put('/:id', async(req, res) => {
     if(email){
         const { error: emailError } = EmailValidation.validate({email})
         if ( emailError ){
-            return res.status(400).json({
+            return res.json({
                 error: "The email is not valid",
                 data: null
             })
         }
         //Busca si el email existe en la base de datos (~Falta verificar que no existe en la coleccion de empleados)
         const emailExists = await user.findOne({ email: email })
-        if (emailExists){
-            return res.status(400).json({
+        console.log(emailExists)
+        if (emailExists && !new mongoose.Types.ObjectId(id).equals(emailExists._id)){ 
+            return res.json({
                 error: "Email already exists",
                 data: null
             })
         }
         if (typeof emailExists !== undefined && emailExists){
             if(!new mongoose.Types.ObjectId(id).equals(emailExists._id)){
-                return res.status(400).json({
+                return res.json({
                     error: "Email already exists",
                     data: null
                 })
@@ -269,6 +266,10 @@ router.delete('/:id', async(req, res) => {
         return res.status(400).json({ error: "You can't delete that" })
     }
     try{
+        const notes = await note.find({id_user: id})
+        notes.forEach(async n => {
+            await note.findByIdAndDelete(n._id)
+        })
         const User = await user.findByIdAndDelete(id)
         return res.json({
             error: null,
